@@ -48,7 +48,7 @@ const options = {
 
 ## Test Case 01
 
-CB 6.6 with Scope and Collection provided
+CB 6.6 (Legacy) with Scope and Collection provided as model options
 
 ### Options
 
@@ -63,33 +63,37 @@ const options = {
 
 ```JavaScript
 _Model {
-  callsign: 'ORACLE',
+  callsign: 'CBA',
   country: 'United States',
-  name: 'Oracle Airlines',
-  id: '30a1d0f3-dd7c-40c8-906d-a598c74d0f27',
+  name: 'Couchbase Airlines',
+  id: '48bbab70-277b-4730-ba4a-c53fa200b292',
   _type: 'Airlines',
   _scope: 'us'
 }
 ```
 
-### Document Created 
+### Document Created
 
 ```JavaScript
-key: 'us$Airlines::30a1d0f3-dd7c-40c8-906d-a598c74d0f27'
+key: 'us$Airlines::48bbab70-277b-4730-ba4a-c53fa200b292'
 
 value: {
-  callsign: "ORACLE",
+  callsign: "CBA",
   country: "United States",
-  name: "Oracle Airlines",
-  id: "30a1d0f3-dd7c-40c8-906d-a598c74d0f27",
+  name: "Couchbase Airlines",
+  id: "48bbab70-277b-4730-ba4a-c53fa200b292",
   _type: "Airlines",
   _scope: "us"
 }
 ```
 
+### Expected Result
+
+This should have failed and thrown an error for document creation because we have explicitly specified a scope and collection.
+
 ## Test Case 02
 
-CB 6.6 with default Options
+CB 6.6 (Legacy) with model options not provided
 
 ### Options
 
@@ -110,7 +114,7 @@ _Model {
 }
 ```
 
-### Document Created 
+### Document Created
 
 ```JavaScript
 key: '_default$Airline::a5fb3197-133d-4a92-aba3-6be359127c22'
@@ -125,10 +129,14 @@ value: {
 }
 ```
 
+### Expected Result
+
+This should have created a document but there should not be a field `_scope` with value of `_default`.
+
 ### Options
 
 ```JavaScript
-const options = { 
+const options = {
   scopeName: '_default'
 }
 ```
@@ -146,7 +154,7 @@ _Model {
 }
 ```
 
-### Document Created 
+### Document Created
 
 ```JavaScript
 key:  '_default$Airline::58979c16-d41f-45d3-b37e-906c5df68798'
@@ -161,9 +169,13 @@ value: {
 }
 ```
 
-## Test Case 03
+### Expected Result
 
-CB 7.0 with default Options
+This should have created a doc but there should not be a field `_scope` with value of `_default`.
+
+## Test Case 03A
+
+CB 7.0 (Scope & Collection Supported) with model options not provided without using start
 
 ### Options
 
@@ -193,13 +205,13 @@ CollectionNotFoundError: collection not found
 }
 ```
 
-### Document Created 
+### Document Created
 
 No document created
 
-## Test Case 04
+## Test Case 03B
 
-CB 7.0 with Scope and Collection provided
+CB 7.0 (Scope & Collection Supported) with model options not provided using start
 
 ### Options
 
@@ -207,21 +219,78 @@ CB 7.0 with Scope and Collection provided
 const options = {}
 ```
 
-### Return Value Without Defined Scope
+### Return Value
 
 ```sh
-ScopeNotFoundError: scope not found
-    at _getWrappedErr (/Users/ericbishard/dev/src/github/httpjunkie/ottoman-six-to-seven/node_modules/couchbase/lib/errors.js:848:14)
-    at Object.wrapLcbErr (/Users/ericbishard/dev/src/github/httpjunkie/ottoman-six-to-seven/node_modules/couchbase/lib/errors.js:1009:20)
-    at /Users/ericbishard/dev/src/github/httpjunkie/ottoman-six-to-seven/node_modules/couchbase/lib/collection.js:572:24 {
-  cause: LibcouchbaseError { code: 217 },
-  context: undefined
+_Model {
+  callsign: 'CBA',
+  country: 'United States',
+  name: 'Couchbase Airlines',
+  id: '02b64f3f-41b6-49f4-9c48-0cce957ef598',
+  _type: 'Airline',
+  _scope: '_default'
 }
 ```
 
-### Document Created 
+### Document Created
 
-No document created
+```JavaScript
+key:  '_default$Airline::02b64f3f-41b6-49f4-9c48-0cce957ef598'
+
+value: {
+  callsign: "CBA",
+  country: "United States",
+  name: "Couchbase Airlines",
+  id: "02b64f3f-41b6-49f4-9c48-0cce957ef598",
+  _type: "Airline",
+  _scope: "_default"
+}
+```
+
+### Expected Result
+
+Without specifying start a collection of 'Airline' should be added to the default scope. `_type` with value of `Airline` and `_scope` having a value of `_default` should not be added.
+
+## Test Case 04
+
+CB 7.0 (Scope & Collection Supported) with model options provided and using start
+
+### Options
+
+```JavaScript
+const options = {
+  collectionName: 'Airlines',
+  scopeName: 'us'
+}
+```
+
+### Return Value Without Defined Scope
+
+```sh
+_Model {
+  callsign: 'CBA',
+  country: 'United States',
+  name: 'Couchbase Airlines',
+  id: '5d095363-f149-4d56-982d-efc4aef4b816',
+  _type: 'Airlines',
+  _scope: 'us'
+}
+```
+
+### Document Created
+
+```JavaScript
+key:  'us$Airlines::5d095363-f149-4d56-982d-efc4aef4b816'
+
+value: {
+  callsign: "CBA",
+  country: "United States",
+  name: "Couchbase Airlines",
+  id: "5d095363-f149-4d56-982d-efc4aef4b816",
+  _type: "Airlines",
+  _scope: "us"
+}
+```
 
 ### Options
 
@@ -232,7 +301,7 @@ const options = {
 }
 ```
 
-### Return Value Without Defined Scope
+### Return Value
 
 ```sh
 _Model {
@@ -245,7 +314,25 @@ _Model {
 }
 ```
 
-### Document Created 
+### Document Created
 
-No document created
+```JavaScript
+key:  'us$Airlines::5d095363-f149-4d56-982d-efc4aef4b816'
 
+value: {
+  callsign: "CBA",
+  country: "United States",
+  name: "Couchbase Airlines",
+  id: "5d095363-f149-4d56-982d-efc4aef4b816",
+  _type: "Airlines",
+  _scope: "_default"
+}
+```
+
+### Expected Result for last two options
+
+Document should be created under the specified scope adding a collection as specified
+
+### Observerved
+
+Document was created but there should not be a field named `_scope` with value supplied ('us or '_default')

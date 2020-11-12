@@ -18,7 +18,7 @@ const schema = new Schema({
 
 const options = { 
   collectionName: 'Airlines', 
-  scopeName: '_default'
+  scopeName: 'us'
 }
 
 const Airline = connection.model(
@@ -43,10 +43,14 @@ const runAsync = async() => {
   process.exit(0)
 }
 
-ottoman.ensureIndexes()
+let useCollections = true
+ottoman.start({useCollections})
   .then(() => {
     runAsync()
-      .catch((e) => console.log(e))
+      .catch(e => {
+        console.log(e)
+        //process.exit(0)
+      })
   })
 
 // run against CB Server 7.0

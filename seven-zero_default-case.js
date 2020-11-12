@@ -16,9 +16,7 @@ const schema = new Schema({
   name: String
 })
 
-const options = { 
-  scopeName: '_default'
-}
+const options = {}
 
 const Airline = connection.model(
   'Airline', schema, options
@@ -41,7 +39,8 @@ const runAsync = async() => {
   }
 }
 
-ottoman.ensureIndexes()
+let useCollections = true
+ottoman.start({useCollections})
   .then(() => {
     runAsync()
       .catch(e => {
